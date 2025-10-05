@@ -13,7 +13,7 @@ setupTailwind();
 // --- Main App Component ---
 export default function App() {
   // Game State Management
-  const [gameState, setGameState] = useState('SETUP'); // SETUP, MASTER_REVEAL, TOPIC_SETUP, ROLE_REVEAL, DISCUSSION, VOTE, RESULT
+  const [gameState, setGameState] = useState('SETUP'); // SETUP, RULES, MASTER_REVEAL, TOPIC_SETUP, ROLE_REVEAL, DISCUSSION, VOTE, RESULT
   const [settings, setSettings] = useState({
     playerCount: 4,
     gameTime: 300, // 5 minutes in seconds
@@ -181,6 +181,51 @@ export default function App() {
   };
 
   // --- Render Functions ---
+
+  const renderRules = () => (
+    <div className="p-6 font-serif h-full flex flex-col">
+        <h1 className="text-3xl font-bold text-center mb-4 text-stone-800">遊び方</h1>
+        <div className="flex-grow overflow-y-auto text-stone-700 space-y-4 pr-2 text-left">
+            <div>
+                <h2 className="text-xl font-bold text-stone-800 border-b-2 border-stone-400 pb-1 mb-2">役職</h2>
+                <ul className="list-disc list-inside space-y-2">
+                    <li><strong className="text-stone-900">容疑者:</strong> 事件に巻き込まれてしまった一般人。「事件解決の鍵」を突き止め、自らの疑いを晴らすのが目的。</li>
+                    <li><strong className="text-stone-900">情報屋:</strong> 犯人に恨みを持つ裏社会の情報屋。「事件解決の鍵」を知っているが、正体を知られる分けにはいかない。皆を「鍵」の発見に導き、犯人への復讐を果たすのが目的。</li>
+                    <li><strong className="text-red-800">犯人:</strong> 事件の犯人。犯人なので当然「事件解決の鍵」を知っている。「鍵」の特定を妨害するのが目的。仮に「鍵」が見つけられても、情報屋を特定することで罪をかぶせることができる。</li>
+                    <li><strong className="text-stone-900">証人:</strong> 「事件解決の鍵」を知り、質問に「はい」「いいえ」「わからない」だけで答える。なぜ最初から「鍵」を教えないのか、その理由は彼らの立場にある。</li>
+                </ul>
+            </div>
+            <div>
+                <h2 className="text-xl font-bold text-stone-800 border-b-2 border-stone-400 pb-1 mb-2">勝利条件</h2>
+                <div className="space-y-3">
+                    <div className="bg-stone-200 p-3 rounded-sm border-l-4 border-green-800">
+                        <h3 className="font-bold text-lg text-green-900">【「鍵」が見つかった場合】</h3>
+                        <p>犯人による<strong className="text-red-800">【情報屋の特定】</strong>が始まる。</p>
+                        <ul className="list-disc list-inside mt-1">
+                            <li>犯人が情報屋を<strong className="text-red-800">当てた</strong> → <strong className="text-red-800">犯人の逆転勝利！</strong></li>
+                            <li>犯人が情報屋を<strong className="text-green-800">外した</strong> → <strong className="text-green-800">容疑者チームの勝利！</strong></li>
+                        </ul>
+                    </div>
+                    <div className="bg-stone-200 p-3 rounded-sm border-l-4 border-red-800">
+                        <h3 className="font-bold text-lg text-red-900">【「鍵」が見つからなかった場合】</h3>
+                        <p>全員で<strong className="text-green-800">【犯人の特定】</strong>が始まる。</p>
+                         <ul className="list-disc list-inside mt-1">
+                            <li>全員で犯人を<strong className="text-green-800">当てた</strong> → <strong className="text-green-800">容疑者チームの勝利！</strong></li>
+                            <li>全員で犯人を<strong className="text-red-800">外した</strong> → <strong className="text-red-800">犯人の勝利！</strong></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button
+            onClick={() => setGameState('SETUP')}
+            className="w-full mt-4 bg-stone-800 text-stone-100 font-bold py-3 px-4 rounded-sm hover:bg-stone-700 tracking-wider"
+        >
+            設定に戻る
+        </button>
+    </div>
+  );
+
   const renderSetup = () => {
     const playerInputs = Array.from({ length: settings.playerCount }, (_, i) => (
       <input
@@ -194,7 +239,16 @@ export default function App() {
     ));
 
     return (
-      <div className="p-6 md:p-8 font-serif">
+      <div className="relative p-6 md:p-8 font-serif">
+         <button
+            onClick={() => setGameState('RULES')}
+            className="absolute top-4 right-4 text-stone-500 hover:text-stone-900 transition-colors z-10"
+            aria-label="ルールを表示"
+        >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+        </button>
         <h1 className="text-4xl font-bold text-center mb-2 text-stone-800">事件簿</h1>
         <p className="text-center text-stone-600 mb-8">ゲーム設定</p>
         <form onSubmit={handleSetupSubmit} className="space-y-6">
@@ -285,12 +339,15 @@ export default function App() {
         <>
           <p className="text-xl text-stone-600 mb-2">{currentPlayerForReveal?.name}氏の役職は...</p>
           <h1 className="text-5xl font-extrabold text-red-800 mb-8">{getRoleNameInJapanese(currentPlayerForReveal?.role)}</h1>
-          {['Saboteur', 'Pathfinder'].includes(currentPlayerForReveal?.role) && (
-            <p className="mb-2 text-stone-700">事件解決の鍵は「<span className="font-bold font-mono text-stone-900">{secretTopic}</span>」だ。</p>
+          
+          {['Saboteur', 'Pathfinder'].includes(currentPlayerForReveal?.role) ? (
+            <p className="my-4 text-stone-700">事件解決の鍵は「<span className="font-bold font-mono text-stone-900">{secretTopic}</span>」だ。</p>
+          ) : (
+            <div className="w-full max-w-sm p-2 border-2 border-red-800 my-4">
+              <p className="text-red-800 font-bold text-lg">TOP SECRET</p>
+            </div>
           )}
-          <div className="w-full max-w-sm p-2 border-2 border-red-800 my-4">
-            <p className="text-red-800 font-bold text-lg">TOP SECRET</p>
-          </div>
+
           <p className="mb-8 text-stone-700">確認後、次の容疑者に資料を回してください。</p>
           <button onClick={handleNextRoleReveal} className="w-full max-w-sm bg-stone-800 text-stone-100 font-bold py-3 px-4 rounded-sm hover:bg-stone-700 tracking-wider">確認した</button>
         </>
@@ -398,47 +455,27 @@ export default function App() {
     
     let winnerText, winnerMessage, winnerColorClass;
 
-    if (wasWordGuessed && votedPlayer.role === 'Pathfinder') { // Pathfinder is 情報屋
-      winnerText = `${getRoleNameInJapanese('Saboteur')}の勝利！`;
-      winnerMessage = '犯人は、騒ぎに紛れて情報屋を的確に指摘した！';
-      winnerColorClass = 'text-red-800';
-    }
-    else if (!wasWordGuessed && votedPlayer.role === 'Saboteur') { // Saboteur is 犯人
-      winnerText = '容疑者チームの勝利！';
-      winnerMessage = '聞き込みの末、ついに犯人を見つけ出した！';
-      winnerColorClass = 'text-green-800';
-    }
-    else {
-      const losingMessage = wasWordGuessed ? '情報屋は正体を隠し通し、事件は解決へと向かった！' : '犯人は最後まで逃げ切り、事件は迷宮入りとなった…。';
-      const winnerRole = wasWordGuessed ? getRoleNameInJapanese('Pathfinder') : getRoleNameInJapanese('Saboteur');
-      winnerText = `${winnerRole}の勝利！`;
-      winnerMessage = losingMessage;
-      winnerColorClass = wasWordGuessed ? 'text-green-800' : 'text-red-800';
-    }
-
-    // A more direct mapping for the original logic to avoid confusion.
-    if(wasWordGuessed) { // 鍵がわかった
-        if(votedPlayer.role === 'Pathfinder') { // 投票先が情報屋
+    if(wasWordGuessed) {
+        if(votedPlayer.role === 'Pathfinder') {
             winnerText = '犯人の勝利！';
-            winnerMessage = '犯人は、騒ぎに紛れて情報屋を的確に指摘した！';
+            winnerMessage = '犯人は、情報屋に罪を被せることに成功した！';
             winnerColorClass = 'text-red-800';
-        } else { // 投票先が情報屋以外
+        } else {
             winnerText = '容疑者チームの勝利！';
             winnerMessage = '情報屋は正体を隠し通し、事件は解決へと向かった！';
             winnerColorClass = 'text-green-800';
         }
-    } else { // 鍵がわからなかった
-        if(votedPlayer.role === 'Saboteur') { // 投票先が犯人
+    } else {
+        if(votedPlayer.role === 'Saboteur') {
             winnerText = '容疑者チームの勝利！';
-            winnerMessage = '聞き込みの末、ついに犯人を見つけ出した！';
+            winnerMessage = '「事件解決の鍵」は見つからなかったが、不審な行動から犯人を特定した！';
             winnerColorClass = 'text-green-800';
-        } else { // 投票先が犯人以外
+        } else {
             winnerText = '犯人の勝利！';
             winnerMessage = '犯人は最後まで逃げ切り、事件は迷宮入りとなった…。';
             winnerColorClass = 'text-red-800';
         }
     }
-
 
     return (
       <div className="text-center flex flex-col justify-start items-center h-full p-6 overflow-y-auto font-serif">
@@ -473,6 +510,7 @@ export default function App() {
   const renderContent = () => {
     switch (gameState) {
       case 'SETUP': return renderSetup();
+      case 'RULES': return renderRules();
       case 'MASTER_REVEAL': return renderMasterReveal();
       case 'TOPIC_SETUP': return renderTopicSetup();
       case 'MASTER_ROLE_REVEAL': return renderMasterRoleReveal();
