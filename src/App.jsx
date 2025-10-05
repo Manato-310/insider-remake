@@ -309,7 +309,7 @@ export default function App() {
   const renderTopicSetup = () => (
     <div className="text-center p-8 font-serif">
       <h1 className="text-2xl font-bold mb-4 text-stone-800">{masterPlayer?.name}氏、「事件解決の鍵」を記入</h1>
-      <textarea value={secretTopic} onChange={e => setSecretTopic(e.target.value)} placeholder="例：被害者の万年筆" className="w-full p-3 mb-6 bg-stone-50 border-2 border-stone-400 rounded-sm text-center text-xl font-mono focus:ring-stone-500 focus:border-stone-500" rows="2"></textarea>
+      <textarea value={secretTopic} onChange={e => setSecretTopic(e.target.value)} placeholder="例：万年筆" className="w-full p-3 mb-6 bg-stone-50 border-2 border-stone-400 rounded-sm text-center text-xl font-mono focus:ring-stone-500 focus:border-stone-500" rows="2"></textarea>
       <button disabled={!secretTopic} onClick={() => setGameState('MASTER_ROLE_REVEAL')} className="w-full max-w-sm bg-green-800 text-white font-bold py-3 px-4 rounded-sm hover:bg-green-700 disabled:bg-stone-400 tracking-wider">鍵を決定</button>
     </div>
   );
